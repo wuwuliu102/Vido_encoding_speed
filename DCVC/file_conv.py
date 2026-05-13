@@ -1,22 +1,6 @@
 ﻿# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-"""
-dcvc_test_split.py
 
-基于你附件 test.txt（moban.py）脚本的工程化改造版本：把"端到端(encode+decode)"拆成
-可独立执行的两个阶段：
-  1) encode: 读源视频 → DCVC-RT compress → 写 .bin
-  2) decode: 读 .bin   → DCVC-RT decompress → (可选)算 PSNR/SSIM/写重建帧
-
-关键目标：
-- 编码与解码可以单独运行（例如只做编码性能、或只做解码性能/只解码不同机器上的同一 bitstream）
-- 保持原工程 JSON 输出结构（generate_log_json），方便延续你 Word 表格的统计口径
-- decode-only 模式下也能独立计算 bits（通过解析 .bin 的字节消耗），不依赖 encode log
-- 完善时间统计：同时记录GPU核心时间和端到端时间
-
-
-注意：
-- 如你要把它合并回原 test_video.py，只需要把"新增参数 + 拆分函数"合并即可
 
 """
 
@@ -146,11 +130,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_nonframe_nals", type=int, default=1000,
                         help="max continuous non-frame NAL count to avoid abnormal bitstream dead-loop")
 
-    # -------- 输入模式--------
+  
     parser.add_argument("--input_mode", type=str, default="file", choices=["file", "camera"],
                         help="file=绂荤嚎鏂囦欢锛沜amera=Jetson 澶栭儴宸ヤ笟鐩告満")
 
-    # -------- Jetson camera 参数 --------
     parser.add_argument("--camera_backend", type=str, default="jetson_gst", choices=["jetson_gst"])
     parser.add_argument("--camera_device", type=str, default="/dev/video0")
     parser.add_argument("--camera_format", type=str, default="YUY2", choices=["YUY2", "MJPG", "MJPEG"])
